@@ -1,14 +1,21 @@
-const User = require("../models/user.model");
+const User = require("../models/user.model.js");
 
 const getAllUsers = async (req, res) => {
 
     try {
+
+        console.log("getAllUsers hit ");
+        
 
         const users = await User.find().select(" -password");
 
         if (!users) {
             return res.status(400).json({ message: "No Users" });
         }
+
+        res.status(200).json({
+            data:users
+        })
 
     } catch (error) {
 
@@ -25,6 +32,7 @@ const updateUserRole = async (req, res) => {
         const { role } = req.body;
 
         const validRoles = ['viewer', 'analyst', 'admin'];
+        
         if (!validRoles.includes(role)) {
             return res.status(400).json({ message: "Invalid role" });
         }
