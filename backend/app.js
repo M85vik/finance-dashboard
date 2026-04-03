@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db.js');
 const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
 
 
 
@@ -27,5 +28,7 @@ app.get("/", (req,res)=>{
 // Auth Routes 
 app.use('/api/auth', authRoutes);
 
+
+app.use('/api/users', userRoutes);
 
 module.exports = app;
