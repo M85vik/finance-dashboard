@@ -29,12 +29,21 @@ const sendToken = (res, token) => {
 
 
 const register = async (req, res) => {
+    console.log("API hit");
 
     try {
 
-        const { name, email, password } = req.body
+        const { name, email, password, role } = req.body
 
-        const userExists = User.findOne({ email });
+        const allowedRoles = ['viewer', 'analyst', 'admin'];
+
+        let finalRole = 'viewer';
+
+        // If admin is creating user, allow role assignment
+        if (req.user && req.user.role === 'admin' && role && allowedRoles.includes(role)) {
+            finalRole = role;
+        }
+        const userExists = await User.findOne({ email });
 
         if (userExists) {
             return res.status(400).json({ message: "User Already Exists" })
@@ -45,7 +54,8 @@ const register = async (req, res) => {
         const user = await User.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: finalRole
         })
 
         const token = generateToken(user);
@@ -66,9 +76,13 @@ const login = async (req, res) => {
 
     try {
 
+        if (!req.body) {
+            return res.status(400).json({ message: "Request body is missing" });
+        }
+
         const { email, password } = req.body
 
-        const user = User.findOne({ email });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(400).json({ message: "Invalid Credentials" });
@@ -77,6 +91,10 @@ const login = async (req, res) => {
         if (user.status === "inactive") {
             return res.status(403).json({ message: "User is Inactive" });
 
+        }
+
+        if (!password || !user.password) {
+            return res.status(400).json({ message: "Invalid Credentials" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
