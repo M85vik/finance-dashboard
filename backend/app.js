@@ -7,6 +7,7 @@ const connectDB = require('./config/db.js');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 
+const recordRoutes = require('./routes/record.routes');
 
 
 const app = express();
@@ -30,5 +31,7 @@ app.use('/api/auth', authRoutes);
 
 
 app.use('/api/users', userRoutes);
+
+app.use('/api/records', recordRoutes);
 
 module.exports = app;
